@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 288" width="880" height="288" role="img" aria-labelledby="title desc">
   <title id="title">続編の道のり</title>
-  <desc id="desc">1 行のタイムライン。準備（約 20 分）は 1 前提チェック、2 複製と Issue 投入、3 プロジェクト追加と Yolo。本編（約 70 分）は 4 Issue からワークツリー、5 並列で 3 本を走らせる、6 #1 を PR に、7 #2 #3 も PR に、8 #1 をマージ、9 #2 をマージ → #3 が競合、10 競合を解消してマージ、11 後片付けと手動に戻す。付録（任意）は A rebase と Force push、B トラブル対処、C Yolo の判断基準。1〜11 章の下にはチェックポイントの印がある。</desc>
+  <desc id="desc">1 行のタイムライン。準備（約 20 分）は 1 前提チェック、2 複製と Issue 投入、3 プロジェクト追加と Yolo。本編（約 80 分）は 4 Issue からワークツリー、5 並列で 3 本を走らせる、6 #1 を PR に、7 #2 #3 も PR に、8 #1 をマージ、9 #2 をマージ → #3 が競合、10 競合を解消してマージ、11 後片付けと手動に戻す。付録（任意）は A rebase と Force push、B トラブル対処、C Yolo の判断基準。1〜11 章の下にはチェックポイントの印がある。</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
       <path d="M1 1L9 5L1 9z" fill="#57606A"/>
@@ -25,7 +25,7 @@
     </g>
     <g font-weight="600" text-anchor="middle">
       <text x="117" y="92">準備（約 20 分）</text>
-      <text x="430.5" y="92">本編（約 70 分）</text>
+      <text x="430.5" y="92">本編（約 80 分）</text>
       <text x="744" y="92">付録（任意）</text>
     </g>
 
