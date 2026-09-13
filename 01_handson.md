@@ -8,6 +8,8 @@
 Orca は更新が速く、ボタンの文言や配置が変わることがあります。本書の表記は上記バージョンの実機で確認したものです。
 画面と食い違ったら、主要な用語に（ ）で併記した英語ドキュメントの呼び方を手がかりに [公式ドキュメント](https://www.onorca.dev/docs) を探してください。
 
+> **スクリーンショットについて**: 画像は検証用に `orca-handson-2-test` という名前で複製したリポジトリで撮影しています。あなたの画面では `orca-handson-2` と読み替えてください。サイドバーに筆者の別プロジェクトも写っていますが、あなたの画面には出ません。画面が大きいので、必要な部分だけを切り出しています。
+>
 > **キー表記**: ⌘ = command、⇧ = shift、↩ = Enter（return）、⌫ = delete
 
 ---
@@ -19,7 +21,7 @@ Orca は更新が速く、ボタンの文言や配置が変わることがあり
 - GitHub の **Issue からワークツリーを作り**、Issue をエージェントに実装させられる
 - **別々のタスクを 3 本同時に** 走らせ、それぞれを PR にできる
 - PR パネルで **チェック（CI）の結果を見てマージ** し、Issue を自動で閉じられる
-- 後からマージする PR で起きた **コンフリクトを、Orca の競合 UI とエージェントで解消** できる
+- 後からマージする PR で起きた **コンフリクトを、Orca の競合表示を見ながらエージェントに解消させる** ことができる
 - **Yolo モード** を「使ってよい場面」を判断して使い、終わったら手動に戻せる
 
 ### 全体の流れ
@@ -35,7 +37,8 @@ Orca は更新が速く、ボタンの文言や配置が変わることがあり
 | | 第1弾 | 続編 |
 |---|---|---|
 | タスク | 同じバグ修正を Claude Code と Codex で競争 | 別々の機能追加を 3 本並列（#1 Claude Code、#2 Codex、#3 Claude Code） |
-| ワークツリーの作り方 | 「名前」タブに名前を打つ | 「GitHub」タブで **Issue を選ぶ** |
+| ワークツリーの作り方 | 「名前」タブに名前を打つ | 「GitHub」タブで **Issue を選ぶ**。名前もブランチ名も Issue から自動で付く |
+| エージェントへの指示 | 指示文を貼る | **Issue の URL が最初から入力欄に入っている**。その後ろに一言添えるだけ |
 | 権限 | 手動（毎回確認する） | **Yolo**（確認なし。練習リポなので解禁し、終わったら戻す） |
 | PR | 作るまで | チェック確認 → **マージ** → **コンフリクト解消** → Issue が閉じるまで |
 
@@ -48,6 +51,8 @@ Orca は更新が速く、ボタンの文言や配置が変わることがあり
 | マージ（Merge） | PR のブランチの変更を `main` に取り込むこと。今回は Orca の PR パネルから行います |
 | コンフリクト（競合、Conflict） | 2 つのブランチが **同じファイルの同じ場所** を別々に変えたため、git が自動で合成できない状態 |
 | 分岐元（base、`origin/main`） | ワークツリーを切ったときの元。他の PR がマージされると `origin/main` が先に進み、自分のブランチが「古く」なります |
+
+Issue と PR は **番号を共有** します。今回は Issue が #1〜#3 なので、PR は #4 から始まります。
 
 ---
 
@@ -109,6 +114,11 @@ bash scripts/seed-issues.sh
   https://github.com/<あなたのID>/orca-handson-2/issues/2
 作成しました: applyCoupon を追加する（クーポンコードで割引する）
   https://github.com/<あなたのID>/orca-handson-2/issues/3
+
+現在の Issue:
+3  OPEN  applyCoupon を追加する（クーポンコードで割引する）  ...
+2  OPEN  calcShipping を追加する（送料計算。3,000 円以上で送料無料）  ...
+1  OPEN  formatDateJa を追加する（日付を「2026年9月13日」形式にする）  ...
 ```
 
 スクリプトの中身は `issues/*.md` を番号順に読み、1 行目をタイトル、2 行目以降を本文にして `gh issue create` を呼んでいるだけです。同じタイトルの Issue があれば作らないので、何度実行しても増えません。
@@ -125,7 +135,7 @@ bash scripts/seed-issues.sh
 
 #2 と #3 が **同じ 2 ファイル** を触ることに注目してください。どちらも `src/price.js` 冒頭の「定数ブロック」に定数を足し、末尾に関数を足し、`test/price.test.js` の末尾にテストを足します。これが 9〜10 章のコンフリクトの種です。
 
-> `.github/workflows/test.yml` も一緒に複製されています。これは GitHub Actions の設定で、PR を作ると `npm test` が GitHub 上で実行され、結果が PR に付きます（8 章で見ます）。
+> `.github/workflows/test.yml` も一緒に複製されています。これは GitHub Actions の設定で、PR を作ると `npm test` が GitHub 上で実行され、結果が PR に付きます（8 章で見ます）。複製直後にも `main` に対して 1 回走ります。
 
 ✅ **ここまでできたら**: 自分の GitHub に `orca-handson-2` があり、Issue が #1〜#3 の 3 件 open、ローカルで `npm test` が 9 件成功。
 
@@ -150,6 +160,8 @@ Orca で、サイドバーの「プロジェクト」右側の **＋**（また�
 
 4 つとも ✓ なら、設定（⌘,）→ 「**Agent**」→ 「**Agent の権限**」を **Yolo** にします。「インストール済み」の欄が `claude --dangerously-skip-permissions`、`codex --dangerously-bypass-approvals-and-sandbox` に変わります（第1弾 3 章の逆の操作です）。
 
+![Agent 設定。「Agent の権限」が Yolo になっていると、インストール済みの欄に権限スキップのフラグが表示される](images/22_settings_agent_yolo.png)
+
 権限の 3 層の図を再掲します。今変えたのは 1 層目だけで、Yolo にすると 2 層目（エージェント自身の確認）も **フラグで丸ごとスキップ** されます。3 層目（macOS のフォルダアクセス）はそのままです。
 
 ![権限の 3 つの層。1 層目 Orca の「Agent の権限」は起動コマンドにフラグを付けるかだけを決める。2 層目はエージェント自身の権限モード。3 層目は macOS のフォルダアクセス許可](images/diagrams/02_permission-layers.svg)
@@ -166,78 +178,114 @@ Orca で、サイドバーの「プロジェクト」右側の **＋**（また�
 
 ### 4-1. #1 のワークツリー（Claude Code）
 
-サイドバーで `orca-handson-2` を選び **⌘N** を押します。「ワークツリーを作成する」ダイアログで、名前欄の上のタブを「**GitHub**」に切り替えると、このリポジトリの Issue と PR の一覧が出ます。
+サイドバーで `orca-handson-2` をクリックして選び、**⌘N** を押します。「ワークツリーを作成する」ダイアログが開きます。
 
 | 項目 | 入れる値 |
 |---|---|
-| プロジェクト | `orca-handson-2`（右の灰色の文字が `<あなたのID>/orca-handson-2` であること） |
+| プロジェクト | `orca-handson-2` になっているか確認。**別のプロジェクトを最後に触っていると、そちらが入っていることがあります。** 右の灰色の文字が `<あなたのID>/orca-handson-2` でなければ、ドロップダウンで選び直す |
 | 実行先 | `Local Mac` のまま |
-| タブ | 「**GitHub**」→ 一覧から **#1 formatDateJa を追加する** を選ぶ |
+| タブ | 「**GitHub**」に切り替える（既定は「スマート」） |
 | Agent | **Claude** |
 | 詳細設定 | 触らない |
 
-Issue を選ぶと、タスク名が Issue から自動で入り、Issue が **このワークツリーにリンク** されます。「ワークツリーを作成する ⌘↩」を押します。
+「GitHub」タブに切り替えると、入力欄の下にこのリポジトリの Issue と PR の一覧が出ます。**新しいものが上** なので、#3、#2、#1 の順に並んでいます。
+
+![作成ダイアログの GitHub タブ。Issue #3、#2、#1 が新しい順に並ぶ](images/01_create_dialog_github_tab.png)
+
+一番下の **#1 formatDateJa を追加する** をクリックします。入力欄が Issue のチップに変わり、右に「ブラウザでリンクを開く」と「選択したソースをクリアする（×）」のアイコンが付きます。
+
+![Issue #1 を選んだ状態。入力欄が Issue のチップになり、Agent は Claude](images/02_create_dialog_issue_selected.png)
+
+「詳細設定」を開くと、**名前が Issue のタイトルから自動で作られている** のが見えます（例: `formatdateja-2026-9-13`。英数字と数字だけが残ります）。ブランチ名は `<あなたのID>/formatdateja-2026-9-13` になります。ここは見るだけで、変えずに閉じて構いません。
+
+![詳細設定を開いた状態。名前欄に Issue から作られた formatdateja-2026-9-13 が入っている](images/03_create_dialog_advanced_branch.png)
 
 > 「**スマート**」タブでも同じことができます。入力欄に `#1` や Issue の URL を貼ると候補が出ます。「GitHub」タブは一覧から選ぶ、「スマート」タブは検索して選ぶ、という違いです。
 
-作成直後にサイドバーに新しいワークツリーが出て、ブランチ名は Issue から自動で付きます。ワークツリーの行（カード）にリンクされた Issue が表示されます。
+「**ワークツリーを作成する ⌘↩**」を押します。
 
-### 4-2. Yolo での Claude Code 起動画面
+### 4-2. 作成直後に起きること
 
-中央のターミナルで `claude --dangerously-skip-permissions` が起動します。フラグ付きで起動した Claude Code は、初回に **「Bypass Permissions mode」の警告画面** を出します。内容（このモードは信頼できる隔離環境でだけ使うこと、など）を読み、「**Yes, I accept**」を選んで ↩ を押します。
-第1弾と同じ「Quick safety check（フォルダを信頼するか）」が先に出ることもあります。その場合は「Yes, I trust this folder」→ 続けて上の警告画面、の順です。
+- サイドバーに新しいワークツリーのカードが出ます。**カードの名前は Issue のタイトル**、その下にブランチ名、右端に Issue へのリンクアイコンが付きます
+- 第1弾と同じ「セットアップスクリプトを追加する」のポップアップが出たら × で閉じます（依存パッケージはありません）
+- 中央のターミナルは **数秒だけ `zsh` のプロンプト** のままで、その後に自動で次のコマンドが流れます
 
-`❯` のプロンプトが出たら準備完了です。**まだ指示は貼りません**（5 章で 3 本まとめて貼ります）。
+```
+claude '--dangerously-skip-permissions' --prefill 'https://github.com/<あなたのID>/orca-handson-2/issues/1'
+```
 
-### 4-3. #2（Codex）と #3（Claude Code）のワークツリー
+`--dangerously-skip-permissions` が 3 章で Yolo にした効果、`--prefill '<Issue の URL>'` が **Issue から作ったワークツリーの効果** です。Orca は Issue の URL をエージェントの入力欄に **あらかじめ入れて** 起動します。
 
-同じ操作を 2 回繰り返します。
+### 4-3. Claude Code の起動画面
 
-| | タブ「GitHub」で選ぶ Issue | Agent |
+Claude Code は起動時に、状況に応じて次の画面を出します。出た順に答えてください。
+
+1. **Quick safety check**（フォルダを信頼するか）… 第1弾と同じです。↓ で「**Yes, I trust this folder**」を選んで ↩。このリポジトリで最初のワークツリーだけに出て、2 本目以降は出ません
+2. **Bypass Permissions mode の警告** … `--dangerously-skip-permissions` 付きで初めて起動したときに出ます。内容（信頼できる隔離環境でだけ使うこと）を読んで「**Yes, I accept**」を選んで ↩。一度承諾すると次からは出ません
+
+プロンプトが出ると、入力欄には Issue の URL が入っていて、その下に **「⚠ Pre-filled prompt · review before pressing Enter」** と表示されます。「入力欄に文が入っているから、送る前に確認して」という Claude Code からの注意です。**まだ ↩ は押しません**（5 章で 3 本まとめて送ります）。一番下の行に `bypass permissions on` と出ているのが Yolo の印です。
+
+![Claude Code の入力欄に Issue の URL が入り、Pre-filled prompt の注意と bypass permissions on が表示されている](images/04_claude_prefilled_issue_url.png)
+
+### 4-4. #2（Codex）と #3（Claude Code）のワークツリー
+
+同じ操作を 2 回繰り返します。プロジェクトは今度は最初から `orca-handson-2` になっているはずです。
+
+| | 「GitHub」タブで選ぶ Issue | Agent |
 |---|---|---|
-| 2 本目 | **#2 calcShipping を追加する** | **Codex** |
+| 2 本目 | **#2 calcShipping を追加する** | ドロップダウンから **Codex** |
 | 3 本目 | **#3 applyCoupon を追加する** | **Claude** |
 
-Codex は `codex --dangerously-bypass-approvals-and-sandbox` で起動し、承諾画面なしでプロンプト（`» Ask Codex to do anything`）が出ます。3 本目の Claude Code では、4-2 の承諾画面はもう出ません。
+Agent のドロップダウンには「ブランクターミナル / Claude / Claude Agent Teams / Codex / GitHub Copilot / Gemini / Kiro / Cursor」が並びます。Codex は `codex '--dangerously-bypass-approvals-and-sandbox'` で起動し、起動画面に `permissions: YOLO mode` と出ます。Codex の入力欄（`»`）にも Issue の URL が入っています。
 
-サイドバーに 3 本のワークツリーが並び、それぞれにリンクされた Issue 番号が見えているはずです。
+ブランチ名の例: `<ID>/calcshipping-3-000`、`<ID>/applycoupon`（Issue タイトルから作られるので、数字が入ったり入らなかったりします）。
 
-> **なぜ #1, #2 が先に Codex/Claude ではないのか**: 担当の割り振りは「どのエージェントが得意か」ではなく **タスクごとに好きに選べる** ことを見せるためのものです。#3 を Claude Code にしたのは、10 章のコンフリクト解消という重めの作業を任せるためです。
+> **なぜ #2 だけ Codex なのか**: 担当の割り振りは「どのエージェントが得意か」ではなく **タスクごとに好きに選べる** ことを見せるためです。#3 を Claude Code にしたのは、10 章のコンフリクト解消という重めの作業を任せるためです。
 
-✅ **ここまでできたら**: サイドバーに 3 本のワークツリー（#1 Claude、#2 Codex、#3 Claude）が並び、3 つのターミナルでエージェントのプロンプトが待っている。
+✅ **ここまでできたら**: サイドバーに 3 本のワークツリー（カード名が Issue のタイトル）が並び、3 つのターミナルの入力欄に Issue の URL が入って待っている。
 
 ---
 
 ## 5. 3 本を並列で走らせる（15 分）
 
-### 5-1. 同じ指示を 3 本に貼る（Issue 番号だけ変える）
+### 5-1. URL の後ろに一言添えて送る
 
-各ワークツリーのターミナルに、次の指示を貼って ↩ します。`N` はそのワークツリーの Issue 番号（1、2、3）に置き換えてください。
+各ワークツリーのターミナルで、入力欄の **URL の後ろにスペースを 1 つ入れて**、次の文を貼り付けてから ↩ します（3 本とも同じ文で構いません）。
 
 ```
-gh issue view N を実行して Issue #N を読み、受け入れ条件をすべて満たすように実装してください。実装が終わったら npm test を実行してすべて成功することを確認し、何をどう実装したかを日本語で簡潔に報告してください。
+この Issue を読み、受け入れ条件をすべて満たすように実装してください。実装が終わったら npm test を実行してすべて成功することを確認し、何をどう実装したかを日本語で簡潔に報告してください。
 ```
 
-Yolo なので、エージェントが `gh` を叩いても、ファイルを書き換えても、`npm test` を走らせても **確認は出ません**。第1弾で読んでいた確認プロンプトの中身を、今回は **差分で後から読む** ことになります。
+URL だけで ↩ しても動きますが、「テストを回す」「日本語で報告する」を添えると、5-3 で読む報告がそろいます。
 
-> ワークツリーの切り替えは **⌘J** でワークツリー名の一部を打つのが速いです（第1弾 8 章）。3 本並べて眺めたいときは ⌘J → Shift+↩ で分割ペインに開けます（第1弾 7-3）。
+Yolo なので、エージェントが Issue を読みに行っても、ファイルを書き換えても、`npm test` を走らせても **確認は出ません**。第1弾で読んでいた確認プロンプトの中身を、今回は **差分で後から読む** ことになります。
+
+> ワークツリーの切り替えは **⌘J** でワークツリー名の一部（`coupon` など）を打つのが速いです（第1弾 8 章）。3 本並べて眺めたいときは ⌘J → Shift+↩ で分割ペインに開けます（第1弾 7-3）。
 
 ### 5-2. 待っている間に見るもの
 
+![3 本が同時に動いているサイドバー。カード名は Issue のタイトル、その下にブランチ名と最初の指示文](images/05_sidebar_three_worktrees_running.png)
+
 - サイドバーのアイコンで進み具合が分かります（スピナー = 作業中、ベル = あなたの番、緑のチェック = 完了。一覧は第1弾 7-4）
-- Codex のワークツリーの下に `default` の子行が出るのは、Codex のサブエージェントです
-- 参考値: 今回の実測では 3 本とも 1〜3 分で完走しました。順番は毎回変わります
+- カードの下の行に、最初の指示文の冒頭とエージェント名（Codex は `gpt-…` のモデル名）が出ます
+- 参考値: 今回の実測では 3 本とも **40 秒〜1 分半** で完走しました。順番は毎回変わります
 
 ### 5-3. 完了したら報告を読む
 
-3 本とも緑のチェックになったら、各ターミナルの日本語の報告を読みます。見るのは次の 2 点です。
+3 本とも緑のチェック（またはベル）になったら、各ターミナルの日本語の報告を読みます。
+
+![3 本とも完了したサイドバー。緑のチェックとベルが付いている](images/06_sidebar_three_done.png)
+
+見るのは次の 2 点です。
 
 - Issue の **受け入れ条件を 1 つずつ満たしたと言っているか**（定数を定数ブロックに置いたか、テストを末尾に足したか、既存を触っていないか）
-- `npm test` の結果に **fail 0** と書いてあるか
+- `npm test` の結果に **fail 0** と書いてあるか。参考値: #1 は 12 件、#2 は 13 件、#3 は 15 件になります（元の 9 件 + それぞれ 3、4、6 件）
 
 報告を読んだだけで信じないでください。次の章で差分を自分の目で読みます。
 
-✅ **ここまでできたら**: 3 本のワークツリーに緑のチェックが付き、各ターミナルに日本語の報告がある。
+> Claude Code の入力欄に、灰色で「コミットして PR を作成してください」のような **提案文** が出ることがあります。Claude Code が次の一手を提案する機能です。今回は Orca の Source Control から PR を作る練習なので、**この提案はそのまま ↩ しないでください**（入力欄をクリックして自分の文を打てば消えます）。
+
+✅ **ここまでできたら**: 3 本のワークツリーが完了し、各ターミナルに日本語の報告があり、どれも fail 0。
 
 ---
 
@@ -247,19 +295,23 @@ Yolo なので、エージェントが `gh` を叩いても、ファイルを書
 
 ### 6-1. 差分を読む
 
-サイドバー（または ⌘J）で **#1 のワークツリー** を選び、右パネルの **Source Control**（ブランチアイコン）→ 「変更点」の「**すべて見る**」で Changes を開きます。
+サイドバー（または ⌘J）で **#1 のワークツリー**（formatDateJa）を選び、右パネルの **Source Control**（3 番目のブランチアイコン）を開きます。「変更点 2」に `date.js` と `date.test.js` が並んでいます。
 
-見る観点は第1弾と同じ 3 つです。
+![Source Control パネル。PR を作成、ブランチ → origin/main、メッセージ欄、ステージオール、変更点 2](images/07_sc_panel_changes.png)
+
+「**すべて見る**」で Changes を開き、第1弾と同じ 3 つの観点で読みます。
 
 - [ ] **仕様どおりか**: Issue の表の 3 例（`2026年9月13日`、`2026年1月5日`、`2026年12月25日`）がテストに入っているか。ゼロ埋めしていないか
-- [ ] **余計なことをしていないか**: 変更ファイルが `src/date.js` と `test/date.test.js` の 2 つだけか。既存の `formatDate` とそのテストは触っていないか
+- [ ] **余計なことをしていないか**: 変更ファイルが `src/date.js` と `test/date.test.js` の 2 つだけか。既存の `formatDate` とそのテストは触っていないか（`import` 行に関数名が 1 つ増えるのは正常です）
 - [ ] **読めるか**: JSDoc が日本語で付いているか
 
 気になる行があれば、第1弾 10 章の **Annotate**（行の ＋ → メモ → Send）でエージェントに直させてから先へ進んでください。問題なければ次へ。
 
 ### 6-2. コミットする（`Closes #1` を付ける）
 
-Source Control で「**＋ ステージオール**」→ メッセージ欄の **AI アイコン** でコミットメッセージを生成します。**生成された文を読んで、事実と違えば直してください**。そのうえで、メッセージの **末尾に 1 行空けて** 次を追記します。
+Source Control で「**＋ ステージオール**」を押すと、見出しが「ステージ済みの変更 2」になり、メッセージ欄が有効になります。メッセージ欄右上の **AI アイコン** でコミットメッセージを生成します（10〜20 秒。英語で出ることもあります）。**生成された文を読んで、事実と違えば直してください**。
+
+そのうえで、メッセージの **末尾に 1 行空けて** 次を追記します。
 
 ```
 Closes #1
@@ -267,17 +319,26 @@ Closes #1
 
 `Closes #N`（`Fixes #N`、`Resolves #N` でも同じ）は GitHub のキーワードで、**このコミットが `main` に入った時点で Issue #N が自動的に閉じます**。PR の本文に書いても同じ効果があります。今回は Orca が PR の本文を空で作るので、コミットメッセージに書くのが確実です。
 
-「**Commit**」（⌘↩）を押します。
+![コミットメッセージの末尾に Closes #1 を追記した状態。ボタンは Commit](images/08_sc_message_closes.png)
+
+「**✓ Commit**」を押します（メッセージ欄で ⌘↩ でも可）。
 
 ### 6-3. push して PR を作る
 
-ボタンが「**ブランチを公開**」（Publish Branch）に変わるので押します。push が終わったら、パネル上部の「**PR を作成**」を押します。第1弾と同じく、確認ダイアログなしで PR ができ、パネル上部が「PR #4」のような表示に変わります（**Issue と PR は番号を共有する** ので、PR の番号は 4 から始まります）。
+コミットすると、ボタンが「**ブランチを公開**」（Publish Branch）に変わり、右上に `↑1` が出ます。押して push します。
 
-> PR 作成時にタイトル・説明のダイアログが出るバージョンでは、「AI で PR の説明を生成」して内容を確認してから作成してください。
+![コミット後。ボタンが「ブランチを公開」になり、コミット先のブランチに 2 ファイルが並ぶ](images/09_sc_publish_branch.png)
 
-右パネルの **4 番目のアイコン（PR）** を押すと、PR の状態が OPEN で、「チェック」の欄に `test` が **実行中**（黄色）で出ているはずです。GitHub Actions が動き始めた印です。結果は 8 章で見ます。
+push が終わったら、パネル上部の「**PR を作成**」を押します。第1弾と同じく確認ダイアログなしで PR ができ、右パネルが自動で **PR パネル**（4 番目のアイコン）に切り替わります。
 
-✅ **ここまでできたら**: #1 の PR が OPEN で、PR パネルにチェック `test` が出ている。
+- 上部に **#4 OPEN**（PR の番号は Issue と共有なので 4 から始まります）
+- タイトルはブランチ名から（例: `Formatdateja 2026 9 13`）、本文は空
+- 緑の「**Create merge commit**」ボタン（**まだ押しません**。8 章で押します）
+- 「**1 保留中**」の下に `test` が **Queued** または **In progress**。GitHub Actions が動き始めた印です
+
+![PR 作成直後の PR パネル。#4 OPEN、Create merge commit、チェック test が Queued](images/10_pr_panel_checks_queued.png)
+
+✅ **ここまでできたら**: #1 の PR（#4）が OPEN で、PR パネルにチェック `test` が出ている。
 
 ---
 
@@ -299,7 +360,7 @@ cd ~/Documents/orca-handson-2
 gh pr list
 ```
 
-3 行出れば OK です。この時点では **どの PR も競合していません**。3 本とも同じ `main` から分岐していて、`main` はまだ動いていないからです。
+#4、#5、#6 の 3 行が出れば OK です。この時点では **どの PR も競合していません**。3 本とも同じ `main` から分岐していて、`main` はまだ動いていないからです。
 
 ✅ **ここまでできたら**: `gh pr list` に PR が 3 本、サイドバーの 3 本のワークツリーに PR アイコンが付いている。
 
@@ -313,15 +374,23 @@ gh pr list
 
 ### 8-1. チェックが緑になるのを待つ
 
-#1 のワークツリーを選び、右パネルの **PR** を開きます。「チェック」の `test` が **成功（緑の ✓）** になっているのを確認します。まだ黄色なら数十秒待ちます（参考値: `npm test` だけなので 30〜60 秒）。
+#1 のワークツリーを選び、右パネルの **PR**（4 番目のアイコン）を開きます。表示が古いときは、PR 番号の右にある **更新アイコン**（回転矢印）を押してください。
+
+「保留中」が「**合格**」に変わり、`test` が **Successful**（緑の ✓）になれば準備完了です。まだ黄色なら数十秒待ちます（参考値: `npm test` だけなので 10〜60 秒）。
+
+![チェックが合格した PR パネル。test が Successful](images/11_pr_panel_checks_green.png)
+
+> 画像に写っている `CodeRabbit` は筆者のアカウントに入っているレビューボットで、参加者の環境には出ません。`test` の 1 行だけが出れば正常です。
 
 赤い ✗ になったら、チェック名をクリックすると失敗したジョブのログがその場で読めます。ワークツリーのカードにも赤いチップが付き、PR ビューの「**Fix broken checks**」を押すと、失敗したチェック名とリンクをエージェントに渡して直させることができます（付録 B）。
 
 ### 8-2. マージする
 
-PR パネルの **マージボタン** を押します。ボタンの文言は **リポジトリの既定のマージ方式** に従い、`Create merge commit` / `Squash and merge` / `Rebase and merge` のどれかです。複製直後のリポジトリは `Create merge commit` になっているはずです。
+緑の「**Create merge commit**」を押します。**確認ダイアログは出ず、数秒でマージされます。** ボタンの文言は **リポジトリの既定のマージ方式** に従い、`Create merge commit` / `Squash and merge` / `Rebase and merge` のどれかです。複製直後のリポジトリは `Create merge commit` です。
 
-数秒で PR の状態が **MERGED** に変わります。
+PR の状態が **MERGED** に変わり、ボタンの位置には「**ワークスペースの削除**」が現れます（11 章で使います。今は押しません）。
+
+![マージ後の PR パネル。MERGED になり、ボタンが「ワークスペースの削除」に変わる](images/12_pr_panel_merged.png)
 
 ### 8-3. Issue が閉じたことを確認する
 
@@ -329,9 +398,9 @@ PR パネルの **マージボタン** を押します。ボタンの文言は *
 gh issue view 1
 ```
 
-`state: CLOSED` と出ます。6-2 で書いた `Closes #1` が効いた結果です。ブラウザで Issue #1 を開くと、「このコミットで閉じられた」というリンクが付いています。
+`state: CLOSED` と出ます。6-2 で書いた `Closes #1` が効いた結果です。ブラウザで Issue #1 を開くと、コミットへのリンクと一緒に「closed」になっています。
 
-✅ **ここまでできたら**: #1 の PR が MERGED、Issue #1 が CLOSED。
+✅ **ここまでできたら**: PR #4 が MERGED、Issue #1 が CLOSED。
 
 ---
 
@@ -339,23 +408,30 @@ gh issue view 1
 
 ### 9-1. #2 をマージする
 
-#2 のワークツリーを選び、8 章と同じ手順でマージします（チェックが緑 → マージボタン）。#1 は `date.js` だけ、#2 は `price.js` だけを触っているので、**すんなり** 入ります。`gh issue view 2` が CLOSED になります。
+#2 のワークツリーを選び、8 章と同じ手順でマージします（チェックが緑 → Create merge commit）。#1 は `date.js` だけ、#2 は `price.js` だけを触っているので、**すんなり** 入ります。`gh issue view 2` が CLOSED になります。
 
 ### 9-2. #3 の PR を見る
 
-**マージ直後に #3 のワークツリーに切り替えて、PR パネルを見てください。** さっきまで問題なかった #3 の PR に、**競合している（This branch has conflicts that must be resolved）** という表示が出ます。GitHub が `main` の新しい状態と #3 のブランチを合成しようとして、できなかったのです。
+**マージ直後に #3 のワークツリーに切り替えて、PR パネルの更新アイコンを押してください。** さっきまで緑だった #3 の PR が、次のように変わります。
 
-何が起きたのかを図にします。
+- 緑のボタンが灰色の「**競合**」になり、押せない
+- 「**競合によりこれがブロックされます PR**」「チェックとマージが完了する前に競合を解決してください。」という警告と、「**解決**」ボタン
+- 「**4 commits 遅れ**（ベースコミット: …）」… `main` が 4 コミット先に進んだ、という意味
+- 「**競合するファイル**」に `src/price.js` と `test/price.test.js`
+
+![競合した PR パネル。ボタンが「競合」になり、競合するファイルが 2 つ表示される](images/13_pr_panel_conflict.png)
+
+GitHub が `main` の新しい状態と #3 のブランチを合成しようとして、できなかったのです。何が起きたのかを図にします。
 
 ![コンフリクトの仕組み。main、#2 のブランチ、#3 のブランチが src/price.js の同じ場所（定数ブロックと末尾）を別々に変えた。#2 を main に入れた後で #3 を merge すると、git はどちらを残すか決められない](images/diagrams/11_merge-conflict.svg)
 
-- #2 と #3 は同じ `main` から分岐し、どちらも `src/price.js` の **定数ブロック** に定数を足し、**末尾** に関数を足し、`test/price.test.js` の **末尾** にテストを足した
+- #2 と #3 は同じ `main` から分岐し、どちらも `src/price.js` の **定数ブロック** に定数を足し、**末尾** に関数を足し、`test/price.test.js` の **import 行** と **末尾** にテストを足した
 - #2 が `main` に入った
 - #3 のブランチを `main` に合成しようとすると、同じ場所に **違う行** が足されている。git は「両方残す」のか「片方だけ」なのか判断できないので、人に決めさせる
 
 これが **コンフリクト（競合）** です。日常業務では、複数人・複数エージェントが並列で動いている限り必ず起きます。次の章で解消します。
 
-✅ **ここまでできたら**: #2 の PR が MERGED、Issue #2 が CLOSED、#3 の PR パネルに競合の表示。
+✅ **ここまでできたら**: PR #5 が MERGED、Issue #2 が CLOSED、PR #6 のパネルに「競合」の表示。
 
 ---
 
@@ -363,13 +439,16 @@ gh issue view 1
 
 競合の解消は、**#3 のワークツリーの中で `main` を取り込み、ぶつかった箇所を直して、コミットして push する** 作業です。取り込みには `merge` と `rebase` の 2 通りがあり、今回は **`merge`** を使います（`rebase` は付録 A）。`merge` なら force push が要らないからです。
 
+> PR パネルの「**解決**」ボタンと、次に出てくる Source Control の「**AIで解決する**」ボタンは、この作業をまとめてエージェントに任せる入口です。ただし **本書の検証（1.4.200）では、押すと新しいタブが開くだけでエージェントが起動しませんでした。** そのため本書では、取り込みは自分で打ち、解消はワークツリーで動いている Claude Code に直接頼みます。ボタンが動く環境なら、同じことが自動で進みます（付録 B）。押すと次のダイアログ（使う Agent とプロンプトの確認）が出るので、見かけたら「これのことか」と分かる程度に覚えておいてください。
+>
+> ![「解決」を押すと出る「AI を使用してレビューの競合を解決する」ダイアログ。Agent の選択とコマンドテンプレートを確認して Agent を開始する](images/14_resolve_dialog.png)
+
 ### 10-1. ターミナルで `origin/main` を取り込む
 
-#3 のワークツリーで、エージェントのターミナルとは別に **ブランクターミナル** を開きます（中央のタブバーの ＋ から。ワークツリーのディレクトリで開きます）。次を実行します。
+#3 のワークツリーで、エージェントのターミナルとは別に **ブランクターミナル** を開きます（中央のタブバーの **＋** → 「ブランクターミナル」。ワークツリーのディレクトリで開きます）。次を実行します。
 
 ```bash
-git fetch origin
-git merge origin/main
+git fetch origin && git merge origin/main
 ```
 
 次のような出力が出ます。
@@ -382,23 +461,47 @@ CONFLICT (content): Merge conflict in test/price.test.js
 Automatic merge failed; fix conflicts and then commit the result.
 ```
 
-`CONFLICT` が 2 ファイルに出ました。この状態でファイルを開くと、ぶつかった箇所が `<<<<<<<`、`=======`、`>>>>>>>` の印（コンフリクトマーカー）で囲まれています。ここを人が直すのが本来の作業ですが、今回はエージェントにやらせて、結果を検品します。
+`CONFLICT` が 2 ファイルに出ました。この状態でファイルを開くと、ぶつかった箇所が `<<<<<<<`、`=======`、`>>>>>>>` の印（コンフリクトマーカー）で囲まれています。
 
-> ここでやめたくなったら `git merge --abort` で取り込み前に戻れます。Source Control のメニューにも「Abort merge」があります。
+同時に Orca の表示も変わります。サイドバーのカードに **Merging** のバッジが付き、Source Control パネルが競合モードになります。
 
-### 10-2. 「Resolve with AI」でエージェントに解消させる
+- 「**Merge conflicts: 2 は未解決です**」の警告と、「**AIで解決する**」「**競合をレビューする**」「**マージを中止する**」の 3 ボタン
+- 「**競合 2**」に `price.js` と `price.test.js`（「双方で変更」「未解決」）
+- 「ステージ済みの変更 2」に `date.js` と `date.test.js` … #1 の変更は競合せず、git が自動で取り込んでステージ済みにしたもの
 
-Source Control パネルを見ると、競合中は「**Review conflicts**」と「**Resolve with AI**」が出ています。「**Resolve with AI**」を押し、送り先にこのワークツリーの **Claude Code** を選びます。
+![ブランクターミナルの CONFLICT 出力と、競合モードになった Source Control パネル](images/15_terminal_merge_conflict_and_sc.png)
 
-Claude Code のターミナルに競合ファイルの一覧を含む指示が届き、Claude Code が 2 つのファイルのマーカーを解消します。今回の正解は **「両方残す」** です。定数ブロックには `SHIPPING_FEE` / `FREE_SHIPPING_THRESHOLD` と `COUPONS` の両方、末尾には `calcShipping` と `applyCoupon` の両方、テストにも両方の `describe` が並ぶ形になります。
+> ここでやめたくなったら「**マージを中止する**」（ターミナルなら `git merge --abort`）で取り込み前に戻れます。
 
-### 10-3. 解消結果を検品する
+### 10-2. 競合の中身を見る（競合をレビューする）
 
-「**Review conflicts**」を押すと、競合箇所を **分岐元 / #2（origin/main）/ #3（自分）** の 3 列で見比べる 3-way ビューが開きます。次を確認します。
+「**競合をレビューする**」を押すと、中央に **Conflict Review** タブが開きます。左にファイル一覧（未解決の印付き）、右にコンフリクトマーカーを色分けしたエディタが出て、「前の競合 / 次の競合」で移動できます。**直す前に、何と何がぶつかっているのかを自分の目で見ておいてください。**
 
-- [ ] 定数ブロックに **5 つの定数**（元の 3 つ + `SHIPPING_FEE`, `FREE_SHIPPING_THRESHOLD` + `COUPONS`）が並んでいるか
+![Conflict Review タブ。price.js の末尾で applyCoupon（自分側）と calcShipping（origin/main 側）がぶつかっている](images/16_conflict_review_tab.png)
+
+上の画像では、`=======` の上が自分のブランチ（`applyCoupon`）、下が `origin/main` から来た `calcShipping` です。今回の正解は **「両方残す」** です。定数ブロックには `SHIPPING_FEE` / `FREE_SHIPPING_THRESHOLD` と `COUPONS` の両方、末尾には `calcShipping` と `applyCoupon` の両方、テストにも両方の `describe` と `import` が並ぶ形になります。
+
+### 10-3. Claude Code に解消させる
+
+#3 のワークツリーの **Claude Code のターミナル**（Issue を実装したのと同じセッション）に戻り、次を貼って ↩ します。
+
+```
+いま git merge origin/main の途中で、src/price.js と test/price.test.js がコンフリクトしています。git status と git diff で状況を確認し、両方の変更（origin/main 側の calcShipping と関連する定数・テスト、こちらの applyCoupon と COUPONS・テスト）をすべて残す形でコンフリクトを解消してください。コンフリクトマーカーが 1 つも残っていないことを確認し、npm test がすべて成功することを確かめてください。git add まではしてよいですが、コミットはしないでください。最後に、どの箇所をどう統合したかを日本語で簡潔に報告してください。
+```
+
+参考値: 今回の実測では約 1 分 15 秒で完了し、「定数ブロック、末尾の関数、テストの import と末尾、の 4 か所を両方残す形で統合した」という報告が返ってきました。
+
+### 10-4. 解消結果を検品する
+
+Conflict Review タブの「**更新**」を押すと「**すべての競合が解決されました**」に変わります。Source Control は「**Merge in progress**」と「マージを中止する」だけの表示になり、「ステージ済みの変更 4」に 4 ファイルが並びます。
+
+![解消後。Conflict Review は「すべての競合が解決されました」、Source Control は Merge in progress でステージ済み 4 ファイル](images/17_sc_merge_in_progress_resolved.png)
+
+「ステージ済みの変更」の `price.js` を開いて、次を確認します。
+
+- [ ] 定数ブロックに **6 つの定数**（元の 3 つ + `SHIPPING_FEE`, `FREE_SHIPPING_THRESHOLD` + `COUPONS`）が並んでいるか
 - [ ] `calcShipping` と `applyCoupon` の **両方** が残っているか
-- [ ] `test/price.test.js` に `calcShipping` と `applyCoupon` の **両方** の `describe` があるか
+- [ ] `test/price.test.js` に `calcShipping` と `applyCoupon` の **両方** の `describe` があり、`import` に 4 つの関数が並んでいるか
 - [ ] コンフリクトマーカー（`<<<<<<<` など）が **1 つも残っていない** か
 
 ブランクターミナルでテストも回します。
@@ -407,21 +510,32 @@ Claude Code のターミナルに競合ファイルの一覧を含む指示が�
 npm test
 ```
 
-`fail 0` で、テスト数が増えていること（参考値: 9 + #1 の 3 + #2 の 4 + #3 の 6 = 22 件。エージェントの書き方で多少変わります）を確認します。
+`fail 0` で、テスト数が増えていること（参考値: 9 + #1 の 3 + #2 の 4 + #3 の 6 = **22 件**。エージェントの書き方で多少変わります）を確認します。
 
-### 10-4. コミットして push する
+### 10-5. マージコミットを作って push する
 
-Source Control で「**＋ ステージオール**」→ コミットメッセージはマージコミットなので `Merge origin/main into <ブランチ名>` のような 1 行で構いません（AI 生成でも可）→ 「**Commit**」。
-ボタンが「**Push**」に変わるので押します。`merge` で取り込んだので **force push は不要** です。
+**マージ進行中は、Source Control にコミットメッセージ欄が出ません。** ブランクターミナルで git に用意されているメッセージのままコミットします。
 
-push すると #3 の PR でチェックが再実行されます。PR パネルで競合の表示が消え、チェックが緑になったら **マージボタン** を押します。
+```bash
+git commit --no-edit
+```
+
+`Merge remote-tracking branch 'origin/main' into <ID>/applycoupon` というマージコミットができます。Source Control の表示が元に戻り、ボタンが「**プッシュ**」（Push）になっているので押します。`merge` で取り込んだので **force push は不要** です。
+
+![マージコミット後の Source Control。ボタンが「プッシュ」になっている](images/18_sc_push_after_merge_commit.png)
+
+push すると #3 の PR でチェックが再実行されます。PR パネルの更新アイコンを押すと、競合の警告が消えて緑の「Create merge commit」が戻り、`test` が In progress になっています。
+
+![push 後の PR パネル。競合が消え、Create merge commit が戻り、test が In progress](images/19_pr_panel_conflict_cleared.png)
+
+`test` が Successful になったら「**Create merge commit**」を押します。
 
 ```bash
 gh issue view 3      # CLOSED
 gh pr list           # 何も出ない（3 本ともマージ済み）
 ```
 
-✅ **ここまでできたら**: #3 の PR が MERGED、Issue #1〜#3 がすべて CLOSED、`gh pr list` が空。
+✅ **ここまでできたら**: PR #6 が MERGED、Issue #1〜#3 がすべて CLOSED、`gh pr list` が空。
 
 ---
 
@@ -437,11 +551,19 @@ git pull
 npm test
 ```
 
-`fail 0` で、テスト数は 10-3 で見た数と同じになります。`src/price.js` を開いて、定数ブロックに 5 つの定数、末尾に 2 つの関数が並んでいるのを見てください。
+`fail 0` で、テスト数は 10-4 で見た数と同じになります。`src/price.js` を開いて、定数ブロックに 6 つの定数、関数が 4 つ（`calcTaxIncluded`, `applyDiscount`, `calcShipping`, `applyCoupon`）並んでいるのを見てください。
 
 ### 11-2. ワークツリーを 3 本削除する
 
-サイドバーでワークツリーを右クリック → 「**削除 ⌘⇧⌫**」。3 本とも消します（⌘ を押しながらクリックで複数選択してからまとめて削除もできます）。
+消し方は 3 つあり、どれも同じ確認ダイアログが出ます。
+
+1. マージ済みの PR パネルに出ている「**ワークスペースの削除**」ボタン（8-2 で見たもの）
+2. サイドバーでカードを選んで **⌘⇧⌫**
+3. カードを右クリック → 「削除 ⌘⇧⌫」（第1弾 12 章）
+
+![「ワークスペースの削除」ダイアログ。名前とパスを確認して Delete Workspace](images/20_delete_workspace_dialog.png)
+
+ダイアログにワークツリーの名前とフォルダのパスが出るので、**消す相手が正しいか読んでから**「**Delete Workspace**」を押します。3 本とも消します。
 
 ![ワークツリー削除で消えるもの・残るもの。フォルダと未コミットの変更とローカルブランチは消える。プライマリ、push 済みブランチ、PR は残る](images/diagrams/06_worktree-cleanup.svg)
 
@@ -451,6 +573,8 @@ npm test
 git worktree list    # プライマリの 1 行だけ
 git branch           # main だけ
 ```
+
+![後片付け後のサイドバー。main ［プライマリ］だけが残っている](images/21_sidebar_cleaned.png)
 
 ### 11-3. 「Agent の権限」を手動に戻す
 
@@ -478,12 +602,11 @@ gh issue list --state closed     # 3 件
 ```bash
 git fetch origin
 git rebase origin/main
-# CONFLICT が出たら 10-2 と同じく Resolve with AI で解消し、
-git add -A
+# CONFLICT が出たら 10-3 と同じく Claude Code に解消させ（git add まで）、
 git rebase --continue
 ```
 
-`rebase` は **自分のブランチの履歴を書き換える** ので、すでに push 済みのブランチには普通の `push` ができません。このとき Orca の Source Control には「**Force push with lease**」が **別のボタンとして** 出ます。`--force-with-lease` は「リモートが自分の知っている状態のままなら上書きする」という安全弁付きの force push で、Orca は普通の Push の代わりに黙って force push することはありません。
+`rebase` は **自分のブランチの履歴を書き換える** ので、すでに push 済みのブランチには普通の `push` ができません。このとき Orca の Source Control には「**Force push with lease**」が **別のボタンとして** 出ます。`--force-with-lease` は「リモートが自分の知っている状態のままなら上書きする」という安全弁付きの force push で、Orca は普通のプッシュの代わりに黙って force push することはありません。
 
 ジュニアのうちは **`merge` を既定** にし、`rebase` + force push はチームのルールで求められたときだけ、意味を理解してから使ってください。
 
@@ -498,15 +621,21 @@ git rebase --continue
 | `seed-issues.sh` が `gh にログインしていません` と言う | `gh auth login` を実行してから再実行 |
 | `seed-issues.sh` が `not a git repository` や `no git remotes` と言う | `orca-handson-2` の中で実行しているか確認。`gh repo view` が自分のリポジトリを指しているか |
 | Issue が重複して作られた | スクリプトはタイトル一致でスキップする。手で作った Issue とタイトルが違うと重複する。不要な方を `gh issue close N` で閉じる |
+| 作成ダイアログのプロジェクトが別のリポになっている | 最後に触ったプロジェクトが入る。ドロップダウンで `orca-handson-2` を選ぶ |
 | 作成ダイアログの「GitHub」タブに Issue が出ない | 設定 → 「連携」の GitHub が Connected か。`gh auth status` を確認。少し待って再表示。「スマート」タブに Issue の URL を貼る方法でも作れる |
+| ワークツリーを作ったのに、ターミナルが `zsh` のまま | 数秒待つ。エージェントは少し遅れて起動する。セットアップスクリプトのポップアップが出ていたら × で閉じる。1 分待っても動かなければ、そのターミナルで `claude --dangerously-skip-permissions` と打つ |
 | Claude Code が `--dangerously-skip-permissions` の警告で止まっている | 「Yes, I accept」を選んで ↩。「No, exit」で終了したらそのターミナルで `claude --dangerously-skip-permissions` と打って再起動 |
-| エージェントが `gh issue view` に失敗する | ワークツリーのターミナルで `gh auth status`。`GITHUB_TOKEN` / `GH_TOKEN` 環境変数が古い値なら `unset` する（第1弾 付録 B） |
-| PR パネルの「チェック」に何も出ない | リポジトリの Actions が無効になっていないか（GitHub の Settings → Actions → General）。`.github/workflows/test.yml` が `main` にあるか。PR を作った直後は数十秒かかる |
+| Claude Code の入力欄に灰色の提案文（「コミットして PR を作成してください」など）が出る | Claude Code の提案機能。そのまま ↩ しない。入力欄をクリックして自分の文を打つ |
+| エージェントが Issue を読めない | ワークツリーのターミナルで `gh auth status`。`GITHUB_TOKEN` / `GH_TOKEN` 環境変数が古い値なら `unset` する（第1弾 付録 B） |
+| PR パネルの表示が古い（チェックが保留中のまま、競合が消えない） | PR 番号の右の更新アイコンを押す。GitHub 側の反映に数十秒かかることがある |
+| PR パネルの「チェック」に何も出ない | リポジトリの Actions が無効になっていないか（GitHub の Settings → Actions → General）。`.github/workflows/test.yml` が `main` にあるか |
 | チェックが赤（失敗）になった | チェック名をクリックしてログを読む。PR ビューの「Fix broken checks」でエージェントに渡す。直して push すると再実行される |
 | #2 をマージしても #3 が競合しなかった | エージェントの書き方によっては同じ場所に足さないことがある。その場合は #3 をそのままマージして構いません。「衝突しないことも比較の材料」です。付録 A の手順を空振りで試しておくと感覚がつかめます |
-| Source Control に「Resolve with AI」が出ない | `git status` で `Unmerged paths` があるか確認。出ていなければ競合が残っていない。出ているのにボタンがなければ、Claude Code のターミナルに「`git status` で競合しているファイルを確認して、両方の変更を残す形でコンフリクトを解消し、npm test を通してください」と直接指示する |
+| 「解決」「AIで解決する」を押したら新しいタブが開いたが、`zsh` のプロンプトのまま動かない | 1.4.200 の検証で再現した挙動。そのタブは × で閉じ、10-1〜10-3 の手順（自分で `git merge`、Claude Code に指示）で進める |
+| 「AIで解決する」のダイアログで「このプロンプトを保存し、次回からこの確認を表示しない」をオンのまま進めてしまった | 次回から確認なしでエージェントが起動する設定になる。設定 → 「Git とソース管理」→ 「ソース管理 AI のデフォルト」の Conflict resolution レシピを確認する |
+| Source Control にコミットメッセージ欄がない | マージ進行中（「Merge in progress」表示）はコミット欄が出ない。ターミナルで `git commit --no-edit`（10-5） |
 | `git merge origin/main` が `Already up to date` と言う | `main` が動いていない。#2 がマージ済みか `gh pr list --state merged` で確認 |
-| マージコミット後に「Force push with lease」が出た | `merge` ではなく `rebase` をした、または `--amend` をした。付録 A を読み、意図どおりなら押す。意図しなければ `git reflog` で戻す |
+| Source Control に「Force push with lease」が出た | `merge` ではなく `rebase` をした、または `--amend` をした。付録 A を読み、意図どおりなら押す。意図しなければ `git reflog` で戻す |
 | Yolo を戻し忘れた | 設定 → Agent → 「Agent の権限」を手動に。「インストール済み」の欄でフラグが消えたことを確認 |
 
 ---
@@ -516,7 +645,7 @@ git rebase --continue
 第1弾では、エージェントが何をしようとしているかを **確認プロンプトで読む** ために手動を使いました。続編で Yolo を使ったのは、次の 2 つがそろっていたからです。
 
 1. **リポジトリが使い捨て** で、認証情報もなく、壊れても複製し直せる
-2. **差分を全部読む** 工程（6〜7 章、10-3）が手順に組み込まれている
+2. **差分を全部読む** 工程（6〜7 章、10-4）が手順に組み込まれている
 
 Orca の設計思想は「ワークツリーは使い捨てだから、エージェントには自由にやらせて差分で検品する」です。Yolo はその思想の表れで、確認を読む代わりに **差分を読む** ことで安全を担保します。読まないなら Yolo を使う資格はまだない、というのは第1弾と同じです。
 
@@ -533,7 +662,7 @@ Orca の設計思想は「ワークツリーは使い捨てだから、エージ
 
 - GitHub 連携（Issue からのワークツリー、PR パネル、チェック、マージ）: https://www.onorca.dev/docs/review/github
 - Commit & push（Resolve with AI、Force push with lease）: https://www.onorca.dev/docs/review/commit-push
-- Diff viewer（3-way の競合解消ビュー）: https://www.onorca.dev/docs/review/diff-viewer
+- Diff viewer（競合解消ビュー）: https://www.onorca.dev/docs/review/diff-viewer
 - Worktrees（Issue / PR からの作成、ブランチ名）: https://www.onorca.dev/docs/model/worktrees
 - Troubleshooting GitHub errors: https://www.onorca.dev/docs/github-errors
 - GitHub Docs「キーワードを使用して Issue を PR にリンクする」: https://docs.github.com/ja/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue
