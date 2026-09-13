@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 512" width="880" height="512" role="img" aria-labelledby="t d">
+  <title id="t">コンフリクトの仕組み</title>
+  <desc id="d">同じファイル src/price.js を 3 列で並べる。左は分岐元の main で、定数ブロック、applyDiscount、ファイル末尾の 3 か所がある。中央は #2 のブランチ（Codex）で、定数ブロックに SHIPPING_FEE、ファイル末尾に calcShipping() を足している。右は #3 のブランチ（Claude Code）で、定数ブロックに COUPONS、ファイル末尾に applyCoupon() を足している。足した行の位置は 2 本とも同じ場所。下の赤い枠は、#2 を main に入れた後で #3 を merge したときに出るコンフリクトマーカーの例。HEAD 側に COUPONS、origin/main 側に SHIPPING_FEE が並び、git はどちらを残すか決められないので、人またはエージェントが両方を残す形に直す。test/price.test.js の末尾でも同じことが起きる。</desc>
+  <defs>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', Meiryo, sans-serif; fill: #1F2328; }
+      .title { font-size: 20px; font-weight: bold; }
+      .body { font-size: 13px; }
+      .b600 { font-size: 13px; font-weight: 600; }
+      .cap { font-size: 12px; fill: #57606A; }
+      .mono12 { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+      .mid { text-anchor: middle; }
+      .file { fill: #FFFFFF; stroke-width: 1.5; }
+      .region { fill: #F6F8FA; stroke: #D0D7DE; stroke-width: 1; }
+      .line { fill: #D0D7DE; }
+      .ins-codex { fill: #DDF4FF; stroke: #0969DA; stroke-width: 1; }
+      .ins-claude { fill: #FFF1E5; stroke: #D97757; stroke-width: 1; }
+      .same { fill: none; stroke: #CF222E; stroke-width: 1.5; stroke-dasharray: 3 3; }
+    </style>
+  </defs>
+
+  <!-- 背景カード -->
+  <rect x="0.5" y="0.5" width="879" height="511" rx="12" fill="#FFFFFF" stroke="#D0D7DE"/>
+
+  <!-- タイトル -->
+  <text x="24" y="40" class="title">コンフリクトの仕組み: 同じファイルの同じ場所を 2 本のブランチが変えた</text>
+  <text x="24" y="62" class="cap">3 列とも同じ src/price.js。色の付いた行がそのブランチで足した行。赤い破線でつないだ 2 行が「同じ場所」に当たる</text>
+
+  <!-- 列見出し -->
+  <text x="148" y="90" class="b600 mid" fill="#8250DF">分岐元（main）</text>
+  <text x="440" y="90" class="b600 mid" fill="#0969DA">#2 のブランチ（Codex）</text>
+  <text x="732" y="90" class="b600 mid" fill="#D97757">#3 のブランチ（Claude Code）</text>
+
+  <!-- 左列: 分岐元（main） -->
+  <rect x="24" y="100" width="248" height="224" rx="8" stroke="#8250DF" class="file"/>
+  <text x="36" y="118" class="mono12">src/price.js</text>
+  <line x1="24" y1="126" x2="272" y2="126" stroke="#D0D7DE"/>
+  <!-- 定数ブロック -->
+  <rect x="36" y="134" width="224" height="60" rx="6" class="region"/>
+  <text x="44" y="149" class="cap">定数ブロック</text>
+  <rect x="44" y="156" width="130" height="5" rx="2.5" class="line"/>
+  <rect x="44" y="166" width="160" height="5" rx="2.5" class="line"/>
+  <rect x="44" y="176" width="100" height="5" rx="2.5" class="line"/>
+  <!-- applyDiscount -->
+  <rect x="36" y="202" width="224" height="44" rx="6" class="region"/>
+  <text x="44" y="217" class="mono12" fill="#57606A">applyDiscount()</text>
+  <rect x="44" y="225" width="140" height="5" rx="2.5" class="line"/>
+  <rect x="44" y="235" width="110" height="5" rx="2.5" class="line"/>
+  <!-- ファイル末尾 -->
+  <rect x="36" y="254" width="224" height="60" rx="6" class="region"/>
+  <text x="44" y="269" class="cap">（ファイル末尾）</text>
+  <rect x="44" y="276" width="100" height="5" rx="2.5" class="line"/>
+
+  <!-- 中央列: #2 のブランチ（Codex） -->
+  <rect x="316" y="100" width="248" height="224" rx="8" stroke="#0969DA" class="file"/>
+  <text x="328" y="118" class="mono12">src/price.js</text>
+  <line x1="316" y1="126" x2="564" y2="126" stroke="#D0D7DE"/>
+  <!-- 定数ブロック + SHIPPING_FEE -->
+  <rect x="328" y="134" width="224" height="60" rx="6" class="region"/>
+  <text x="336" y="149" class="cap">定数ブロック</text>
+  <rect x="336" y="156" width="130" height="5" rx="2.5" class="line"/>
+  <rect x="336" y="166" width="208" height="20" rx="4" class="ins-codex"/>
+  <text x="344" y="180" class="mono12">+ SHIPPING_FEE = 500;</text>
+  <!-- applyDiscount（変更なし） -->
+  <rect x="328" y="202" width="224" height="44" rx="6" class="region"/>
+  <text x="336" y="217" class="mono12" fill="#57606A">applyDiscount()</text>
+  <rect x="336" y="225" width="140" height="5" rx="2.5" class="line"/>
+  <rect x="336" y="235" width="110" height="5" rx="2.5" class="line"/>
+  <!-- ファイル末尾 + calcShipping() -->
+  <rect x="328" y="254" width="224" height="60" rx="6" class="region"/>
+  <text x="336" y="269" class="cap">（ファイル末尾）</text>
+  <rect x="336" y="276" width="100" height="5" rx="2.5" class="line"/>
+  <rect x="336" y="286" width="208" height="20" rx="4" class="ins-codex"/>
+  <text x="344" y="300" class="mono12">+ function calcShipping()</text>
+
+  <!-- 右列: #3 のブランチ（Claude Code） -->
+  <rect x="608" y="100" width="248" height="224" rx="8" stroke="#D97757" class="file"/>
+  <text x="620" y="118" class="mono12">src/price.js</text>
+  <line x1="608" y1="126" x2="856" y2="126" stroke="#D0D7DE"/>
+  <!-- 定数ブロック + COUPONS -->
+  <rect x="620" y="134" width="224" height="60" rx="6" class="region"/>
+  <text x="628" y="149" class="cap">定数ブロック</text>
+  <rect x="628" y="156" width="130" height="5" rx="2.5" class="line"/>
+  <rect x="628" y="166" width="208" height="20" rx="4" class="ins-claude"/>
+  <text x="636" y="180" class="mono12">+ COUPONS = { ... };</text>
+  <!-- applyDiscount（変更なし） -->
+  <rect x="620" y="202" width="224" height="44" rx="6" class="region"/>
+  <text x="628" y="217" class="mono12" fill="#57606A">applyDiscount()</text>
+  <rect x="628" y="225" width="140" height="5" rx="2.5" class="line"/>
+  <rect x="628" y="235" width="110" height="5" rx="2.5" class="line"/>
+  <!-- ファイル末尾 + applyCoupon() -->
+  <rect x="620" y="254" width="224" height="60" rx="6" class="region"/>
+  <text x="628" y="269" class="cap">（ファイル末尾）</text>
+  <rect x="628" y="276" width="100" height="5" rx="2.5" class="line"/>
+  <rect x="628" y="286" width="208" height="20" rx="4" class="ins-claude"/>
+  <text x="636" y="300" class="mono12">+ function applyCoupon()</text>
+
+  <!-- 同じ場所（2 本のブランチをつなぐ赤い破線） -->
+  <path d="M564,176 H608" class="same"/>
+  <path d="M564,296 H608" class="same"/>
+
+  <!-- マージ結果: コンフリクトマーカー -->
+  <rect x="24" y="344" width="832" height="148" rx="8" fill="#FFEBE9" stroke="#CF222E" stroke-width="1.5"/>
+  <text x="40" y="368" class="b600" fill="#CF222E">#2 を main に入れた後で #3 を merge すると</text>
+  <rect x="40" y="380" width="312" height="100" rx="6" fill="#FFFFFF" stroke="#D0D7DE"/>
+  <rect x="46" y="403" width="300" height="17" rx="3" fill="#FFF1E5"/>
+  <rect x="46" y="437" width="300" height="17" rx="3" fill="#DDF4FF"/>
+  <text x="52" y="398" class="mono12" fill="#57606A">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</text>
+  <text x="52" y="415" class="mono12">export const COUPONS = { ... };</text>
+  <text x="52" y="432" class="mono12" fill="#57606A">=======</text>
+  <text x="52" y="449" class="mono12">export const SHIPPING_FEE = 500;</text>
+  <text x="52" y="466" class="mono12" fill="#57606A">&gt;&gt;&gt;&gt;&gt;&gt;&gt; origin/main</text>
+
+  <!-- 説明 -->
+  <text x="372" y="404" class="body">git はどちらを残すか決められない</text>
+  <text x="372" y="426" class="body">→ 人（またはエージェント）が両方を残す形に直す</text>
+  <text x="372" y="462" class="cap"><tspan class="mono12">test/price.test.js</tspan> の末尾でも同じことが起きる</text>
+</svg>

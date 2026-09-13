@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 288" width="880" height="288" role="img" aria-labelledby="title desc">
+  <title id="title">続編の道のり</title>
+  <desc id="desc">1 行のタイムライン。準備（約 20 分）は 1 前提チェック、2 複製と Issue 投入、3 プロジェクト追加と Yolo。本編（約 70 分）は 4 Issue からワークツリー、5 並列で 3 本を走らせる、6 #1 を PR に、7 #2 #3 も PR に、8 #1 をマージ、9 #2 をマージ → #3 が競合、10 競合を解消してマージ、11 後片付けと手動に戻す。付録（任意）は A rebase と Force push、B トラブル対処、C Yolo の判断基準。1〜11 章の下にはチェックポイントの印がある。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M1 1L9 5L1 9z" fill="#57606A"/>
+    </marker>
+    <!-- チェックポイントの印 -->
+    <g id="check">
+      <circle r="7" fill="#DAFBE1" stroke="#1A7F37" stroke-width="1.25"/>
+      <path d="M-3.5 0.5l2.5 2.5l4.5-5" fill="none" stroke="#1A7F37" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </defs>
+  <!-- 背景カード -->
+  <rect x="0.5" y="0.5" width="879" height="287" rx="12" fill="#FFFFFF" stroke="#D0D7DE"/>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', Meiryo, sans-serif" fill="#1F2328" font-size="13">
+    <text x="24" y="40" font-size="20" font-weight="700">続編の道のり</text>
+    <text x="856" y="40" text-anchor="end" font-size="12" fill="#57606A">所要時間は目安。付録は必要なときだけ読む</text>
+
+    <!-- グループ（ブラケットと見出し） -->
+    <g fill="none" stroke="#57606A" stroke-width="1.25">
+      <path d="M47 108v-6h140v6"/>
+      <path d="M218 108v-6h425v6"/>
+      <path d="M674 108v-6h140v6"/>
+    </g>
+    <g font-weight="600" text-anchor="middle">
+      <text x="117" y="92">準備（約 20 分）</text>
+      <text x="430.5" y="92">本編（約 70 分）</text>
+      <text x="744" y="92">付録（任意）</text>
+    </g>
+
+    <!-- タイムライン -->
+    <line x1="60" y1="126" x2="826" y2="126" stroke="#57606A" stroke-width="1.75" marker-end="url(#arrow)"/>
+
+    <!-- ノード -->
+    <g stroke="#1F2328" stroke-width="1.5" fill="#FFFFFF">
+      <circle cx="60" cy="126" r="13"/><circle cx="117" cy="126" r="13"/><circle cx="174" cy="126" r="13"/>
+      <circle cx="231" cy="126" r="13"/><circle cx="288" cy="126" r="13"/><circle cx="345" cy="126" r="13"/><circle cx="402" cy="126" r="13"/>
+      <circle cx="459" cy="126" r="13"/><circle cx="516" cy="126" r="13"/><circle cx="573" cy="126" r="13"/><circle cx="630" cy="126" r="13"/>
+      <circle cx="687" cy="126" r="13"/><circle cx="744" cy="126" r="13"/><circle cx="801" cy="126" r="13"/>
+    </g>
+    <g font-size="12" font-weight="700" text-anchor="middle">
+      <text x="60" y="130.5">1</text><text x="117" y="130.5">2</text><text x="174" y="130.5">3</text>
+      <text x="231" y="130.5">4</text><text x="288" y="130.5">5</text><text x="345" y="130.5">6</text><text x="402" y="130.5">7</text>
+      <text x="459" y="130.5">8</text><text x="516" y="130.5">9</text><text x="573" y="130.5">10</text><text x="630" y="130.5">11</text>
+      <text x="687" y="130.5">A</text><text x="744" y="130.5">B</text><text x="801" y="130.5">C</text>
+    </g>
+
+    <!-- チェックポイント（1〜11 章） -->
+    <use href="#check" x="60" y="158"/><use href="#check" x="117" y="158"/><use href="#check" x="174" y="158"/>
+    <use href="#check" x="231" y="158"/><use href="#check" x="288" y="158"/><use href="#check" x="345" y="158"/><use href="#check" x="402" y="158"/>
+    <use href="#check" x="459" y="158"/><use href="#check" x="516" y="158"/><use href="#check" x="573" y="158"/><use href="#check" x="630" y="158"/>
+
+    <!-- 章名までのリーダー線 -->
+    <g stroke="#D0D7DE" stroke-dasharray="2 2">
+      <line x1="60" y1="167" x2="60" y2="176"/><line x1="174" y1="167" x2="174" y2="176"/><line x1="288" y1="167" x2="288" y2="176"/>
+      <line x1="402" y1="167" x2="402" y2="176"/><line x1="516" y1="167" x2="516" y2="176"/><line x1="630" y1="167" x2="630" y2="176"/>
+      <line x1="744" y1="141" x2="744" y2="176"/>
+      <line x1="117" y1="167" x2="117" y2="206"/><line x1="231" y1="167" x2="231" y2="206"/><line x1="345" y1="167" x2="345" y2="206"/>
+      <line x1="459" y1="167" x2="459" y2="206"/><line x1="573" y1="167" x2="573" y2="206"/>
+      <line x1="687" y1="141" x2="687" y2="206"/><line x1="801" y1="141" x2="801" y2="206"/>
+    </g>
+
+    <!-- 章名（上段: 1, 3, 5, 7, 9, 11, B。下段: 2, 4, 6, 8, 10, A, C） -->
+    <g font-size="11" text-anchor="middle">
+      <text x="60" y="188">1 前提チェック</text>
+      <text x="174" y="188">3 プロジェクト<tspan x="174" dy="1.4em">追加と Yolo</tspan></text>
+      <text x="288" y="188">5 並列で 3 本を<tspan x="288" dy="1.4em">走らせる</tspan></text>
+      <text x="402" y="188">7 #2 #3 も PR に</text>
+      <text x="516" y="188">9 #2 をマージ<tspan x="516" dy="1.4em">→ #3 が競合</tspan></text>
+      <text x="630" y="188">11 後片付けと<tspan x="630" dy="1.4em">手動に戻す</tspan></text>
+      <text x="744" y="188">B トラブル対処</text>
+      <text x="117" y="218">2 複製と<tspan x="117" dy="1.4em">Issue 投入</tspan></text>
+      <text x="231" y="218">4 Issue から<tspan x="231" dy="1.4em">ワークツリー</tspan></text>
+      <text x="345" y="218">6 #1 を PR に</text>
+      <text x="459" y="218">8 #1 をマージ</text>
+      <text x="573" y="218">10 競合を解消<tspan x="573" dy="1.4em">してマージ</tspan></text>
+      <text x="687" y="218">A rebase と<tspan x="687" dy="1.4em">Force push</tspan></text>
+      <text x="801" y="218">C Yolo の<tspan x="801" dy="1.4em">判断基準</tspan></text>
+    </g>
+
+    <!-- 凡例 -->
+    <use href="#check" x="40" y="258"/>
+    <text x="54" y="262" font-size="12" fill="#57606A">＝ 章末のチェックポイント（できたか確認してから次へ進む）</text>
+  </g>
+</svg>

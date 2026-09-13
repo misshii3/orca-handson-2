@@ -1,0 +1,137 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 468" width="880" height="468" role="img" aria-labelledby="t d">
+  <title id="t">並列タスクの流れ</title>
+  <desc id="d">左から右へ 4 列。Issue 列には #1 formatDateJa、#2 calcShipping、#3 applyCoupon の 3 つ（scripts/seed-issues.sh で作る）。ワークツリー列では #1 を Claude Code、#2 を Codex、#3 を Claude Code が担当し、それぞれ issue-1、issue-2、issue-3 のワークツリーになる。PR 列では 1 本ごとに 1 件の PR を作る。main へマージ列は上から順に、#1 はすんなり、#2 もすんなり、#3 は競合するので origin/main を取り込んで解消し、もう一度マージする。各列の下に 01_handson.md の章番号（2 章、4〜5 章、6〜7 章、8〜10 章）を示す。</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#57606A"/>
+    </marker>
+    <marker id="arrow-git" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8250DF"/>
+    </marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP', 'Yu Gothic', Meiryo, sans-serif; fill: #1F2328; }
+      .title { font-size: 20px; font-weight: bold; }
+      .head { font-size: 15px; font-weight: 600; }
+      .body { font-size: 13px; }
+      .b600 { font-size: 13px; font-weight: 600; }
+      .cap { font-size: 12px; fill: #57606A; }
+      .mono12 { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+      .mid { text-anchor: middle; }
+      .box { stroke-width: 1.5; }
+      .arrow { fill: none; stroke: #57606A; stroke-width: 1.75; marker-end: url(#arrow); }
+      .timeline { fill: none; stroke: #8250DF; stroke-width: 2; marker-end: url(#arrow-git); }
+      .node { fill: #FBEFFF; stroke: #8250DF; stroke-width: 1.5; }
+      .chip-ok { fill: #DAFBE1; stroke: #1A7F37; stroke-width: 1; }
+      .chip-ng { fill: #FFEBE9; stroke: #CF222E; stroke-width: 1; }
+      .bracket { fill: none; stroke: #D0D7DE; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <!-- 背景カード -->
+  <rect x="0.5" y="0.5" width="879" height="467" rx="12" fill="#FFFFFF" stroke="#D0D7DE"/>
+
+  <!-- タイトル -->
+  <text x="24" y="40" class="title">並列タスクの流れ: 3 つの Issue を 3 本のワークツリーで進め、順にマージする</text>
+
+  <!-- 列見出し -->
+  <text x="112" y="78" class="head mid">Issue</text>
+  <text x="320" y="78" class="head mid">ワークツリー</text>
+  <text x="512" y="78" class="head mid">PR</text>
+  <text x="740" y="78" class="head mid">main へマージ</text>
+
+  <!-- 列 A: Issue（3 つ） -->
+  <rect x="24" y="100" width="176" height="52" rx="8" fill="#F6F8FA" stroke="#D0D7DE" class="box"/>
+  <text x="112" y="122" class="b600 mid">Issue #1</text>
+  <text x="112" y="140" class="mono12 mid" fill="#57606A">formatDateJa</text>
+  <rect x="24" y="172" width="176" height="52" rx="8" fill="#F6F8FA" stroke="#D0D7DE" class="box"/>
+  <text x="112" y="194" class="b600 mid">Issue #2</text>
+  <text x="112" y="212" class="mono12 mid" fill="#57606A">calcShipping</text>
+  <rect x="24" y="244" width="176" height="52" rx="8" fill="#F6F8FA" stroke="#D0D7DE" class="box"/>
+  <text x="112" y="266" class="b600 mid">Issue #3</text>
+  <text x="112" y="284" class="mono12 mid" fill="#57606A">applyCoupon</text>
+
+  <!-- Issue → ワークツリー -->
+  <path d="M200,126 H240" class="arrow"/>
+  <path d="M200,198 H240" class="arrow"/>
+  <path d="M200,270 H240" class="arrow"/>
+
+  <!-- 列 B: ワークツリー（担当エージェントの色） -->
+  <rect x="240" y="100" width="160" height="52" rx="8" fill="#FFF1E5" stroke="#D97757" class="box"/>
+  <text x="320" y="122" class="mono12 mid">issue-1</text>
+  <text x="320" y="140" class="cap mid">Claude Code</text>
+  <rect x="240" y="172" width="160" height="52" rx="8" fill="#DDF4FF" stroke="#0969DA" class="box"/>
+  <text x="320" y="194" class="mono12 mid">issue-2</text>
+  <text x="320" y="212" class="cap mid">Codex</text>
+  <rect x="240" y="244" width="160" height="52" rx="8" fill="#FFF1E5" stroke="#D97757" class="box"/>
+  <text x="320" y="266" class="mono12 mid">issue-3</text>
+  <text x="320" y="284" class="cap mid">Claude Code</text>
+
+  <!-- ワークツリー → PR -->
+  <path d="M400,126 H440" class="arrow"/>
+  <path d="M400,198 H440" class="arrow"/>
+  <path d="M400,270 H440" class="arrow"/>
+
+  <!-- 列 C: PR（1 本につき 1 件） -->
+  <rect x="440" y="100" width="144" height="52" rx="8" fill="#F6F8FA" stroke="#D0D7DE" class="box"/>
+  <text x="512" y="130.5" class="b600 mid">PR（#1 の分）</text>
+  <rect x="440" y="172" width="144" height="52" rx="8" fill="#F6F8FA" stroke="#D0D7DE" class="box"/>
+  <text x="512" y="202.5" class="b600 mid">PR（#2 の分）</text>
+  <rect x="440" y="244" width="144" height="52" rx="8" fill="#F6F8FA" stroke="#D0D7DE" class="box"/>
+  <text x="512" y="274.5" class="b600 mid">PR（#3 の分）</text>
+
+  <!-- PR → main の時間軸 -->
+  <path d="M584,126 H632" class="arrow"/>
+  <path d="M584,198 H632" class="arrow"/>
+  <path d="M584,270 H632" class="arrow"/>
+
+  <!-- 列 D: main の時間軸（上から順にマージ） -->
+  <path d="M640,96 V378" class="timeline"/>
+
+  <!-- 1 番目: #1 をマージ → すんなり -->
+  <circle cx="640" cy="126" r="7" class="node"/>
+  <text x="656" y="130.5" class="body">#1 をマージ</text>
+  <rect x="776" y="116" width="64" height="20" rx="999" class="chip-ok"/>
+  <text x="808" y="130" class="cap mid" fill="#1A7F37">すんなり</text>
+
+  <!-- 2 番目: #2 をマージ → すんなり -->
+  <circle cx="640" cy="198" r="7" class="node"/>
+  <text x="656" y="202.5" class="body">#2 をマージ</text>
+  <rect x="776" y="188" width="64" height="20" rx="999" class="chip-ok"/>
+  <text x="808" y="202" class="cap mid" fill="#1A7F37">すんなり</text>
+
+  <!-- 3 番目: #3 をマージ → 競合 -->
+  <circle cx="640" cy="270" r="7" class="node"/>
+  <text x="656" y="274.5" class="body">#3 をマージ</text>
+  <rect x="776" y="260" width="64" height="20" rx="999" class="chip-ng"/>
+  <text x="808" y="274" class="cap mid" fill="#CF222E">競合</text>
+
+  <!-- 競合の解消（時間軸に沿って下へ） -->
+  <text x="656" y="306" class="cap"><tspan class="mono12">origin/main</tspan> を</text>
+  <text x="656" y="322" class="cap">取り込んで解消</text>
+
+  <!-- 4 番目: #3 をもう一度 → マージ -->
+  <circle cx="640" cy="350" r="7" class="node"/>
+  <text x="656" y="354.5" class="body">#3 をもう一度</text>
+  <rect x="776" y="340" width="64" height="20" rx="999" class="chip-ok"/>
+  <text x="808" y="354" class="cap mid" fill="#1A7F37">マージ</text>
+
+  <!-- 列ごとの補足 -->
+  <text x="112" y="396" class="mono12 mid" fill="#57606A">scripts/seed-issues.sh</text>
+  <text x="112" y="412" class="cap mid">で 3 つ作る</text>
+  <text x="320" y="396" class="cap mid">Issue ごとに 1 本</text>
+  <text x="320" y="412" class="cap mid">担当エージェントを選ぶ</text>
+  <text x="512" y="396" class="cap mid">1 本ごとに 1 件</text>
+  <text x="512" y="412" class="cap mid">ブランチを公開して作成</text>
+  <text x="740" y="396" class="cap mid">上から順に 1 件ずつ</text>
+  <text x="740" y="412" class="cap mid">#3 だけ競合が出る</text>
+
+  <!-- 章番号（01_handson.md） -->
+  <path d="M24,436 V432 H200 V436" class="bracket"/>
+  <path d="M240,436 V432 H400 V436" class="bracket"/>
+  <path d="M440,436 V432 H584 V436" class="bracket"/>
+  <path d="M624,436 V432 H856 V436" class="bracket"/>
+  <text x="112" y="452" class="cap mid">2 章</text>
+  <text x="320" y="452" class="cap mid">4〜5 章</text>
+  <text x="512" y="452" class="cap mid">6〜7 章</text>
+  <text x="740" y="452" class="cap mid">8〜10 章</text>
+</svg>
