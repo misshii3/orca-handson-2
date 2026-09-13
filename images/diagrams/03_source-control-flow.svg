@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 428" width="880" height="428" role="img" aria-labelledby="t d">
   <title id="t">Source Control パネルのボタンと git の段階の対応</title>
-  <desc id="d">上の段は Orca の Source Control パネルの見え方。変更点 2 で「＋ ステージオール」を押すとステージ済みの変更 2 と「✓ Commit」になり、Commit（⌘↩）すると「ブランチを公開」と ↑1 が出る。押すと push され「PR を作成」が押せる。押すと PR #1 が OPEN になる。下の段は対応する git の概念で、作業ツリー、インデックス、ローカルコミット、origin（GitHub 上の自分のリポ）、Pull Request（自分のリポの main へ）。ボタンの文言が今どの段階かを表す。</desc>
+  <desc id="d">上の段は Orca の Source Control パネルの見え方。変更点 2 で「＋ ステージオール」を押すとステージ済みの変更 2 と「✓ Commit」になり、Commit（⌘↩）すると「ブランチを公開」と ↑1 が出る。押すと push され「PR を作成」が押せる。押すと PR #4 が OPEN になる。下の段は対応する git の概念で、作業ツリー、インデックス、ローカルコミット、origin（GitHub 上の自分のリポ）、Pull Request（自分のリポの main へ）。ボタンの文言が今どの段階かを表す。</desc>
   <defs>
     <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="10" markerHeight="10" markerUnits="userSpaceOnUse" orient="auto-start-reverse">
       <path d="M0,0 L10,5 L0,10 z" fill="#57606A"/>
@@ -60,10 +60,10 @@
   <rect x="552" y="140" width="120" height="28" rx="6" class="btn"/>
   <text x="612" y="158" class="ui mid">PR を作成</text>
 
-  <!-- 上段 5: PR #1 OPEN -->
+  <!-- 上段 5: PR #4 OPEN -->
   <path d="M684,144 H712" class="arrow"/>
   <rect x="712" y="100" width="144" height="88" rx="8" fill="#DAFBE1" stroke="#1A7F37" stroke-width="1.5"/>
-  <text x="784" y="130" class="head mid" fill="#1A7F37">PR #1</text>
+  <text x="784" y="130" class="head mid" fill="#1A7F37">PR #4</text>
   <rect x="756" y="142" width="56" height="24" rx="999" fill="#FFFFFF" stroke="#1A7F37" stroke-width="1.5"/>
   <text x="784" y="159" class="ui mid" fill="#1A7F37">OPEN</text>
 

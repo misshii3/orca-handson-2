@@ -20,7 +20,7 @@
 | 権限 | 手動（毎回確認） | **Yolo**（練習リポなので解禁。終わったら戻す） |
 | ゴール | PR を作るまで | **チェック確認 → マージ → コンフリクト解消 → Issue クローズ** まで |
 
-## 進め方（合計 約 90 分）
+## 進め方（合計 約 100 分）
 
 [01_handson.md](./01_handson.md) を上から順に進めてください。準備（1〜3 章）→ 本編（4〜11 章）→ 付録の順です。
 Orca の概念（worktree、ADE、権限の 3 層）は第1弾の [01_overview.md](https://github.com/misshii3/orca-handson/blob/main/01_overview.md) を参照します。
@@ -42,7 +42,7 @@ bash scripts/seed-issues.sh   # 自分のリポジトリに Issue #1〜#3 を作
 ```
 orca-handson-2/
 ├── README.md                    # このファイル
-├── 01_handson.md                # ハンズオン手順（約 90 分）
+├── 01_handson.md                # ハンズオン手順（約 100 分）
 ├── images/                      # 実機のスクリーンショット（01 から参照）
 │   └── diagrams/                # 図解（SVG）
 ├── issues/                      # タスクの Issue 本文（seed-issues.sh が読む）
