@@ -1,0 +1,21 @@
+# PR と main への push で npm test を実行する。
+# 結果は GitHub の PR ページと、Orca の PR パネルの「チェック」に表示される。
+name: test
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
