@@ -30,6 +30,14 @@ Orca は更新が速く、ボタンの文言や配置が変わることがあり
 
 ![続編のロードマップ。準備（1〜3 章）、本編（4〜11 章）、付録の順に進む](images/diagrams/13_handson2-roadmap.svg)
 
+章は 3 つのまとまりに分かれています。各章の末尾にある ✅ **ここまでできたら** を確かめてから、次の章へ進んでください。
+
+| まとまり | 章 | やること | 目安 |
+|---|---|---|---|
+| 準備 | 1〜3 | ツールの確認、リポジトリの複製と Issue の作成、Orca にプロジェクトを追加して Yolo に切り替え | 約 20 分 |
+| 本編（前半） | 4〜7 | Issue からワークツリーを 3 本作り、並列で実装させ、3 本とも PR にする | 約 45 分 |
+| 本編（後半） | 8〜11 | チェックを見てマージ、3 本目の競合を解消してマージ、後片付けをして手動に戻す | 約 35 分 |
+
 本編で体験する流れを 1 枚にすると次のようになります。**3 つの Issue を 3 本のワークツリーで進め、PR を 3 本作り、順にマージします。3 本目で競合が起きます。**
 
 ![並列タスクの流れ。3 つの Issue → 3 本のワークツリー → 3 本の PR → #1、#2 は順にすんなりマージ、#3 は競合を解消してマージ](images/diagrams/10_parallel-tasks-flow.svg)
@@ -58,6 +66,16 @@ Orca は更新が速く、ボタンの文言や配置が変わることがあり
 | Source Control / PR パネル | 右パネル上部の 3 番目（ブランチのアイコン）と 4 番目のアイコン。Source Control でステージ・コミット・push・PR 作成を、PR パネルで PR の状態・チェック・マージを扱います |
 
 Issue と PR は **番号を共有** します。今回は Issue が #1〜#3 なので、PR は #4 から始まります。本書は #1 → #2 → #3 の順に PR を作る前提で、PR を #4、#5、#6 と書きます。順番が違ったら、番号を読み替えてください。
+
+本書に出てくる番号と名前の対応を 1 つの表にまとめます。「いま何番の話か」で迷ったら、ここに戻ってください。
+
+| Issue | 追加する関数（触るファイル） | 担当 | ワークツリー名（例） | PR | 実装後のテスト数（参考） |
+|---|---|---|---|---|---|
+| #1 | `formatDateJa`（`src/date.js`） | Claude Code | `formatdateja-2026-9-13` | #4 | 12 件（9 + 3） |
+| #2 | `calcShipping`（`src/price.js`） | Codex | `calcshipping-3-000` | #5 | 13 件（9 + 4） |
+| #3 | `applyCoupon`（`src/price.js`） | Claude Code | `applycoupon` | #6 | 15 件（9 + 6） |
+
+ワークツリー名は Issue のタイトルから Orca が自動で付けます（4-1）。ブランチ名はその前に `<あなたのID>/` が付きます。テスト数は元の 9 件に各 Issue のテストを足した数で、3 本すべてを `main` に入れると **22 件** になります（10-4）。
 
 ---
 
@@ -121,10 +139,16 @@ bash scripts/seed-issues.sh
   https://github.com/<あなたのID>/orca-handson-2/issues/3
 
 現在の Issue:
-3  OPEN  applyCoupon を追加する（クーポンコードで割引する）  ...
-2  OPEN  calcShipping を追加する（送料計算。3,000 円以上で送料無料）  ...
-1  OPEN  formatDateJa を追加する（日付を「2026年9月13日」形式にする）  ...
+
+Showing 3 of 3 open issues in <あなたのID>/orca-handson-2
+
+ID  TITLE                                      LABELS  UPDATED
+#3  applyCoupon を追加する（クーポンコードで割引する）        less than a minute ago
+#2  calcShipping を追加する（送料計算。3,000 円以上で...       less than a minute ago
+#1  formatDateJa を追加する（日付を「2026年9月13日」形...   less than a minute ago
 ```
+
+一覧のタイトルは画面の幅に合わせて `...` で省略されます。
 
 スクリプトの中身は `issues/*.md` を番号順に読み、1 行目をタイトル、2 行目以降を本文にして `gh issue create` を呼んでいるだけです。同じタイトルの Issue があれば作らないので、何度実行しても増えません。
 
@@ -185,7 +209,7 @@ Orca で、サイドバーの「プロジェクト」右側の **＋**（また�
 
 ### 4-1. #1 のワークツリー（Claude Code）
 
-サイドバーで `orca-handson-2` をクリックして選び、**⌘N** を押します。「ワークツリーを作成する」ダイアログが開きます。
+サイドバーで `orca-handson-2` をクリックして選び、**⌘N** を押します。「ワークツリーを作成する」ダイアログが開きます。プロジェクト名 `orca-handson-2` の右にある **＋**（新規ワークスペース）を押しても同じダイアログが開きます（3-1 で押した「プロジェクト」見出しの右の ＋ とは別のボタンです）。
 
 | 項目 | 入れる値 |
 |---|---|
@@ -383,7 +407,18 @@ cd ~/Documents/orca-handson-2
 gh pr list
 ```
 
-#4、#5、#6 の 3 行が出れば OK です。この時点では **どの PR も競合していません**。3 本とも同じ `main` から分岐していて、`main` はまだ動いていないからです。
+次のように #4、#5、#6 の 3 行が出れば OK です。
+
+```
+Showing 3 of 3 open pull requests in <あなたのID>/orca-handson-2
+
+ID  TITLE                   BRANCH                       CREATED AT
+#6  Applycoupon             <ID>/applycoupon             about 1 minute ago
+#5  Calcshipping 3 000      <ID>/calcshipping-3-000      about 2 minutes ago
+#4  Formatdateja 2026 9 13  <ID>/formatdateja-2026-9-13  about 5 minutes ago
+```
+
+この時点では **どの PR も競合していません**。3 本とも同じ `main` から分岐していて、`main` はまだ動いていないからです。
 
 ✅ **ここまでできたら**: `gh pr list` に PR が 3 本、サイドバーの 3 本のワークツリーに PR アイコンが付いている。
 
@@ -427,6 +462,8 @@ gh issue view 1 --json state
 
 `{"state":"CLOSED"}` と出ます。6-2 で書いた `Closes #1` が効いた結果です。ブラウザで Issue #1 を開くと、コミットへのリンクと一緒に「closed」になっています。
 
+まだ `OPEN` なら、GitHub 側の反映待ちです。マージからクローズまでは通常数秒ですが、今回の検証では約 1 分かかったこともありました。少し待ってからもう一度実行してください。それでも閉じないときは付録 B を見てください。
+
 ✅ **ここまでできたら**: PR #4 が MERGED、Issue #1 が CLOSED。
 
 ---
@@ -465,6 +502,14 @@ GitHub が `main` の新しい状態と #3 のブランチを合成しようと�
 ## 10. #3 の競合を解消してマージする（15 分）
 
 競合の解消は、**#3 のワークツリーの中で `main` を取り込み、ぶつかった箇所を直して、コミットして push する** 作業です。取り込みには `merge` と `rebase` の 2 通りがあります。今回は **`merge`** を使います。`merge` なら force push が要らないからです（`rebase` は付録 A）。
+
+やることは 5 ステップです。
+
+1. ブランクターミナルで `origin/main` を取り込む → `CONFLICT` が出る（10-1）
+2. Conflict Review で、何と何がぶつかったかを自分の目で見る（10-2）
+3. Claude Code に「両方残す」形で解消させる（10-3）
+4. 解消結果を確認し、`npm test` を回す（10-4）
+5. マージコミットを作って push し、PR をマージする（10-5）
 
 この章では、#3 のワークツリーの中で次の 5 か所を行き来します。迷ったらここに戻ってください。
 
@@ -587,10 +632,10 @@ PR パネルの更新アイコンを押し、`test` が Successful になった�
 
 ```bash
 gh issue view 3 --json state   # {"state":"CLOSED"}
-gh pr list           # 何も出ない（3 本ともマージ済み）
+gh pr list                     # no open pull requests in <あなたのID>/orca-handson-2（3 本ともマージ済み）
 ```
 
-✅ **ここまでできたら**: PR #6 が MERGED、Issue #1〜#3 がすべて CLOSED、`gh pr list` が空。
+✅ **ここまでできたら**: PR #6 が MERGED、Issue #1〜#3 がすべて CLOSED、`gh pr list` に open の PR が 1 つもない。
 
 ---
 
@@ -642,8 +687,8 @@ Yolo を使った今回のリポジトリは使い捨てでした。業務のリ
 ### 11-4. Issue を確認する
 
 ```bash
-gh issue list                    # 何も出ない
-gh issue list --state closed     # 3 件
+gh issue list                    # no open issues in <あなたのID>/orca-handson-2
+gh issue list --state closed     # #3、#2、#1 の 3 件が並ぶ
 ```
 
 ✅ **ここまでできたら**: サイドバーに `main` だけ、「Agent の権限」が **手動**、Issue が 3 件とも CLOSED。
@@ -688,6 +733,7 @@ git rebase --continue
 | Claude Code の入力欄に灰色の提案文（「コミットして PR を作成してください」など）が出る | Claude Code の提案機能。そのまま ↩ しない。入力欄をクリックして自分の文を打つ |
 | エージェントが Issue を読めない | ワークツリーのターミナルで `gh auth status`。`GITHUB_TOKEN` / `GH_TOKEN` 環境変数に古い値が入っていたら `unset GITHUB_TOKEN GH_TOKEN` してから `gh auth login`（第1弾 付録 B と同じ） |
 | PR パネルの表示が古い（チェックが保留中のまま、競合が消えない） | PR 番号の右の更新アイコンを押す。GitHub 側の反映に数十秒かかることがある |
+| マージしたのに Issue が CLOSED にならない | GitHub 側の反映に数秒〜1 分ほどかかる。少し待って `gh issue view N --json state` を再実行。それでも OPEN なら、`main` に入ったコミットのメッセージに `Closes #N` が書けているか GitHub のコミット履歴で確かめる。書けていなければ `gh issue close N` で手で閉じる |
 | PR 番号が本書の #4〜#6 と違う | Issue を作り直した、または PR を作った順が本書と違う。番号は読み替えてよい。`gh pr list` で対応を確認する |
 | 「PR を作成」でタイトル・説明の確認ダイアログが出た | バージョンによる違い（第1弾 11-4）。説明欄にも `Closes #N` を書いてから作成する |
 | PR パネルの「チェック」に何も出ない | リポジトリの Actions が無効になっていないか（GitHub の Settings → Actions → General）。`.github/workflows/test.yml` が `main` にあるか |
